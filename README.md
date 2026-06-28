@@ -2,26 +2,7 @@
 
 SkillShare Hub is a localized, peer-to-peer freelance and micro-task marketplace website designed for students and local communities. Users can register as **Buyers** to purchase services or **Sellers** to list services (gigs), accept orders, and deliver completed work.
 
----
-
-## 📂 What to zip (and what to exclude)
-When sharing this project folder, make sure to **exclude** the following to keep the zip file size small:
-* ❌ `.venv/` (your local virtual environment - they will create their own)
-* ❌ `.idea/` (PyCharm configuration files)
-* ❌ `__pycache__/` folders (Python execution cache)
-
-**Keep everything else**, including:
-* `marketplace/` (app code)
-* `skillshare_hub/` (project configurations)
-* `static/` (CSS styling)
-* `media/` (uploaded images/files - optional, keep if you want to share test images)
-* `requirements.txt` (dependencies list)
-* `db.sqlite3` (database - keep this if you want to share registered test accounts and gigs, or delete/exclude it if you want them to start with a fresh blank database)
-* `manage.py`
-
----
-
-## 🚀 Setup Instructions for Your Friends
+## 🚀 Setup Instructions
 
 Follow these steps to set up and run the project on your machine:
 
