@@ -1,0 +1,50 @@
+{% extends 'marketplace/base.html' %}
+
+{% block title %}{{ gig.title }} - SkillShare Hub{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="detail-page">
+        <!-- Left Column: Image -->
+        <div>
+            {% if gig.image %}
+                <img src="{{ gig.image.url }}" alt="{{ gig.title }}" class="detail-image">
+            {% else %}
+                <div class="detail-image placeholder">🎨</div>
+            {% endif %}
+        </div>
+
+        <!-- Right Column: Info Card -->
+        <div class="detail-info">
+            <div class="detail-category">{{ gig.get_category_display }}</div>
+            <h1 class="detail-title">{{ gig.title }}</h1>
+            <div class="detail-price">RM {{ gig.price }}</div>
+
+            <ul class="detail-meta">
+                <li>📦 {{ gig.delivery_time_days }} day delivery</li>
+                <li>👤 {{ gig.seller.username }}</li>
+                <li>📅 {{ gig.created_at|date:"M d, Y" }}</li>
+            </ul>
+
+            <div class="detail-actions">
+                {% if user.is_authenticated %}
+                    {% if user.profile.role == 'buyer' %}
+                        <a href="{% url 'marketplace:order_gig' gig.id %}" class="btn btn-primary btn-full">Order Now</a>
+                    {% elif user == gig.seller %}
+                        <a href="{% url 'marketplace:update_gig' gig.id %}" class="btn btn-secondary btn-full">Edit Gig</a>
+                        <a href="{% url 'marketplace:delete_gig' gig.id %}" class="btn btn-danger btn-full" style="margin-top:0.75rem;">Delete Gig</a>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-full">Login to Order</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Full Width: Description -->
+        <div class="detail-description-section">
+            <h3>About This Gig</h3>
+            <p class="detail-description">{{ gig.description }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

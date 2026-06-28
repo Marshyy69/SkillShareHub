@@ -1,0 +1,91 @@
+{% extends 'marketplace/base.html' %}
+
+{% block title %}My Orders - SkillShare Hub{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="dashboard-header">
+        <h2>My Orders</h2>
+    </div>
+
+    {% if orders %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Gig</th>
+                    <th>Seller</th>
+                    <th>My Requirements</th>
+                    <th>Delivery / Submission</th>
+                    <th>Price</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td style="color:var(--text-muted);">#{{ order.id }}</td>
+                    <td>
+                        <a href="{% url 'marketplace:gig_detail' order.gig.id %}" style="color:var(--text-primary);font-weight:500;">
+                            {{ order.gig.title }}
+                        </a>
+                    </td>
+                    <td style="color:var(--text-secondary);">{{ order.gig.seller.username }}</td>
+                    <td style="max-width:200px;">
+                        {% if order.requirements %}
+                            <span style="color:var(--text-secondary);font-size:0.85rem;" title="{{ order.requirements }}">{{ order.requirements|truncatechars:60 }}</span>
+                        {% else %}
+                            <span style="color:var(--text-muted);font-style:italic;">None provided</span>
+                        {% endif %}
+                    </td>
+                    <td style="max-width:250px;">
+                        {% if order.status == 'delivered' or order.status == 'completed' %}
+                            <div class="delivery-box" style="background: rgba(0, 212, 170, 0.05); border: 1px dashed rgba(0, 212, 170, 0.2); padding: 0.75rem; border-radius: 8px;">
+                                <div style="font-weight: 600; color: var(--success); font-size: 0.8rem; margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.25rem;">
+                                    🎉 Work Delivered
+                                </div>
+                                <p style="margin: 0.25rem 0; font-size: 0.85rem; color: var(--text-secondary); white-space: pre-wrap;">{{ order.submission_text }}</p>
+                                
+                                {% if order.submission_file %}
+                                    <div style="margin-top: 0.5rem;">
+                                        <a href="{{ order.submission_file.url }}" download class="btn btn-sm btn-outline" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;">
+                                            💾 Download Deliverable
+                                        </a>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if order.status == 'delivered' %}
+                                    <form method="post" action="{% url 'marketplace:complete_order' order.id %}" style="margin-top: 0.75rem;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-primary" style="width: 100%; padding: 0.4rem; font-size: 0.8rem; border-radius: 6px;">
+                                            ✔️ Accept &amp; Complete
+                                        </button>
+                                    </form>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <span style="color:var(--text-muted);font-style:italic;font-size:0.85rem;">Waiting for delivery...</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-weight:600;color:var(--accent-primary);">RM {{ order.gig.price }}</td>
+                    <td style="color:var(--text-secondary);">{{ order.date_ordered|date:"M d, Y" }}</td>
+                    <td>
+                        <span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <span class="empty-state-icon">🛒</span>
+        <p>You haven't placed any orders yet.</p>
+        <p style="color:var(--text-muted);font-size:0.9rem;">Browse gigs and find something you need!</p>
+        <a href="{% url 'marketplace:home' %}" class="btn btn-primary">Explore Gigs</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

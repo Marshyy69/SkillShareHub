@@ -1,0 +1,65 @@
+{% extends 'marketplace/base.html' %}
+
+{% block title %}SkillShare Hub - Freelance Marketplace{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <h1>Find &amp; Offer <span>Amazing Services</span></h1>
+    <p>A peer-to-peer marketplace connecting talented students and local creators with people who need their skills.</p>
+    <div class="hero-cta">
+        <a href="#gigs" class="btn btn-primary">Browse Gigs</a>
+    </div>
+</section>
+
+<!-- Search & Filter Bar -->
+<form method="get" action="{% url 'marketplace:home' %}" class="search-filter-bar">
+    <input type="text" name="q" value="{{ query }}" placeholder="Search for services..." class="search-input">
+    <select name="category" class="filter-select">
+        <option value="">All Categories</option>
+        {% for value, label in categories %}
+            <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary btn-sm">Search</button>
+</form>
+
+<!-- Gigs Section -->
+<div class="section-header" id="gigs">
+    <h2>{% if query or selected_category %}Search Results{% else %}Latest Gigs{% endif %}</h2>
+</div>
+
+{% if gigs %}
+<div class="gig-grid">
+    {% for gig in gigs %}
+    <div class="gig-card">
+        {% if gig.image %}
+            <img src="{{ gig.image.url }}" alt="{{ gig.title }}" class="gig-card-image">
+        {% else %}
+            <div class="gig-card-image placeholder">🎨</div>
+        {% endif %}
+        <div class="gig-card-body">
+            <div class="gig-card-category">{{ gig.get_category_display }}</div>
+            <h3 class="gig-card-title">
+                <a href="{% url 'marketplace:gig_detail' gig.id %}">{{ gig.title }}</a>
+            </h3>
+            <p class="gig-card-seller">by {{ gig.seller.username }}</p>
+            <div class="gig-card-footer">
+                <span class="gig-card-price">RM {{ gig.price }}</span>
+                <a href="{% url 'marketplace:gig_detail' gig.id %}" class="btn btn-sm btn-outline">View</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <span class="empty-state-icon">🔍</span>
+    <p>No gigs found.</p>
+    <p style="color:var(--text-muted);font-size:0.9rem;">Try a different search or check back later.</p>
+    {% if user.is_authenticated %}
+        <a href="{% url 'marketplace:create_gig' %}" class="btn btn-primary mt-3">Create the First Gig</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

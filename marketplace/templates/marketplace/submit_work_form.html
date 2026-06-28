@@ -1,0 +1,39 @@
+{% extends 'marketplace/base.html' %}
+
+{% block title %}Submit Work - Order #{{ order.id }} - SkillShare Hub{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="form-container">
+        <h2>📤 Deliver Completed Work</h2>
+        <p class="form-subtitle">Order #{{ order.id }} - {{ order.gig.title }}</p>
+
+        <form method="post" enctype="multipart/form-data" action="{% url 'marketplace:submit_work' order.id %}">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_submission_text">Submission Message / Links</label>
+                {{ form.submission_text }}
+                <p class="form-help">Explain what you completed and provide any links (e.g. Google Drive, Figma, GitHub, Dropbox).</p>
+                {% if form.submission_text.errors %}
+                    <div class="form-error">{{ form.submission_text.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="id_submission_file">Upload Completed File (Optional)</label>
+                {{ form.submission_file }}
+                <p class="form-help">Upload zipped files, images, PDFs, or documents directly.</p>
+                {% if form.submission_file.errors %}
+                    <div class="form-error">{{ form.submission_file.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div style="display:flex; gap:1rem; margin-top:2rem;">
+                <a href="{% url 'marketplace:seller_orders' %}" class="btn btn-outline" style="flex:1; text-align:center;">Cancel</a>
+                <button type="submit" class="btn btn-primary" style="flex:2;">🚀 Deliver Work</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

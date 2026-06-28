@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkillShare Hub - A peer-to-peer freelance marketplace for students and local communities">
+    <title>{% block title %}SkillShare Hub{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="{% url 'marketplace:home' %}" class="navbar-brand">⚡ SkillShare Hub</a>
+            <button class="mobile-toggle" onclick="document.querySelector('.navbar-links').classList.toggle('active')" aria-label="Toggle menu">☰</button>
+            <ul class="navbar-links">
+                <li><a href="{% url 'marketplace:home' %}">Explore</a></li>
+                {% if user.is_authenticated %}
+                    {% if user.profile.role == 'seller' %}
+                        <li><a href="{% url 'marketplace:seller_dashboard' %}">Dashboard</a></li>
+                        <li><a href="{% url 'marketplace:seller_orders' %}">Seller Orders</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'marketplace:my_orders' %}">My Orders</a></li>
+                    <li>
+                        <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="nav-btn nav-btn-danger">Logout ({{ user.username }})</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li><a href="{% url 'login' %}" class="nav-btn nav-btn-primary">Login</a></li>
+                    <li><a href="{% url 'marketplace:register' %}" class="nav-btn nav-btn-outline">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            <span>{{ message }}</span>
+            <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2026 SkillShare Hub. Built for students, by Rian. 🚀</p>
+    </footer>
+</body>
+</html>

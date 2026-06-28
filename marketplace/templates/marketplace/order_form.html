@@ -1,0 +1,148 @@
+{% extends 'marketplace/base.html' %}
+
+{% block title %}Place Order - {{ gig.title }} - SkillShare Hub{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="order-page">
+
+        <!-- Gig Summary Card -->
+        <div class="order-summary-card">
+            <div class="order-summary-header">📋 Order Summary</div>
+            <div class="order-summary-body">
+                {% if gig.image %}
+                    <img src="{{ gig.image.url }}" alt="{{ gig.title }}" class="order-gig-image">
+                {% else %}
+                    <div class="order-gig-image placeholder">🎨</div>
+                {% endif %}
+                <div class="order-gig-info">
+                    <div class="gig-card-category">{{ gig.get_category_display }}</div>
+                    <h3>{{ gig.title }}</h3>
+                    <p class="order-seller">by <strong>{{ gig.seller.username }}</strong></p>
+                    <div class="order-meta-row">
+                        <span>📦 {{ gig.delivery_time_days }} day delivery</span>
+                    </div>
+                    <div class="order-price">RM {{ gig.price }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Requirements Form -->
+        <div class="form-container" style="margin-top:0;">
+            <h2>✍️ Your Requirements</h2>
+            <p class="form-subtitle">Tell the seller exactly what you need. Be as detailed as possible!</p>
+
+            <form method="post" action="{% url 'marketplace:order_gig' gig.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="requirements">Describe your project & ideas</label>
+                    <textarea
+                        id="requirements"
+                        name="requirements"
+                        class="form-input"
+                        rows="8"
+                        placeholder="e.g.&#10;• What exactly do you need?&#10;• Any specific style, tone, or references?&#10;• Colors, formats, or file types required?&#10;• Deadline or urgency?&#10;• Any other details the seller should know..."
+                        required
+                    ></textarea>
+                    <p class="form-help">💡 Clear requirements lead to better results and faster delivery.</p>
+                </div>
+                <div style="display:flex; gap:1rem; margin-top:1.5rem;">
+                    <a href="{% url 'marketplace:gig_detail' gig.id %}" class="btn btn-outline" style="flex:1; text-align:center;">← Back</a>
+                    <button type="submit" class="btn btn-primary" style="flex:2;">🚀 Confirm Order</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<style>
+.order-page {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.order-summary-card {
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: sticky;
+    top: 5rem;
+}
+
+.order-summary-header {
+    padding: 1rem 1.5rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+    background: rgba(124, 91, 245, 0.08);
+    border-bottom: 1px solid var(--glass-border);
+    color: var(--accent-primary);
+    text-transform: uppercase;
+}
+
+.order-summary-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.order-gig-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: var(--radius);
+    background: var(--bg-secondary);
+}
+
+.order-gig-image.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    background: linear-gradient(135deg, rgba(124,91,245,0.15), rgba(0,212,170,0.1));
+}
+
+.order-gig-info h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0.5rem 0 0.3rem;
+    line-height: 1.4;
+}
+
+.order-seller {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.order-meta-row {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.order-price {
+    font-size: 1.6rem;
+    font-weight: 700;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .order-page {
+        grid-template-columns: 1fr;
+    }
+    .order-summary-card {
+        position: static;
+    }
+}
+</style>
+{% endblock %}

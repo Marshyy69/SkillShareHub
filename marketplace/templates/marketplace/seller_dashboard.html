@@ -1,0 +1,65 @@
+{% extends 'marketplace/base.html' %}
+
+{% block title %}Seller Dashboard - SkillShare Hub{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="dashboard-header">
+        <h2>Your Gigs</h2>
+        <a href="{% url 'marketplace:create_gig' %}" class="btn btn-primary">+ Create New Gig</a>
+    </div>
+
+    {% if gigs %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Delivery</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for gig in gigs %}
+                <tr>
+                    <td>
+                        {% if gig.image %}
+                            <img src="{{ gig.image.url }}" alt="{{ gig.title }}" class="table-thumb">
+                        {% else %}
+                            <div class="table-thumb placeholder">🎨</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'marketplace:gig_detail' gig.id %}" style="color:var(--text-primary);font-weight:500;">
+                            {{ gig.title }}
+                        </a>
+                    </td>
+                    <td><span class="badge badge-progress">{{ gig.get_category_display }}</span></td>
+                    <td style="font-weight:600;color:var(--accent-primary);">RM {{ gig.price }}</td>
+                    <td>{{ gig.delivery_time_days }} days</td>
+                    <td style="color:var(--text-secondary);">{{ gig.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <div class="table-actions">
+                            <a href="{% url 'marketplace:update_gig' gig.id %}" class="btn btn-sm btn-outline">Edit</a>
+                            <a href="{% url 'marketplace:delete_gig' gig.id %}" class="btn btn-sm btn-danger">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <span class="empty-state-icon">📦</span>
+        <p>You haven't created any gigs yet.</p>
+        <p style="color:var(--text-muted);font-size:0.9rem;">Start offering your skills to the community!</p>
+        <a href="{% url 'marketplace:create_gig' %}" class="btn btn-primary">Create Your First Gig</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

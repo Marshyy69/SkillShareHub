@@ -1,0 +1,127 @@
+{% extends 'marketplace/base.html' %}
+
+{% block title %}Seller Orders - SkillShare Hub{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="dashboard-header">
+        <h2>Incoming Orders</h2>
+    </div>
+
+    {% if orders %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Gig</th>
+                    <th>Buyer</th>
+                    <th>Requirements</th>
+                    <th>Price</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Deliveries &amp; Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in orders %}
+                <tr>
+                    <td style="color:var(--text-muted);">#{{ order.id }}</td>
+                    <td>
+                        <a href="{% url 'marketplace:gig_detail' order.gig.id %}" style="color:var(--text-primary);font-weight:500;">
+                            {{ order.gig.title }}
+                        </a>
+                    </td>
+                    <td style="color:var(--text-secondary);">{{ order.buyer.username }}</td>
+                    <td style="max-width:200px;">
+                        {% if order.requirements %}
+                            <div class="requirements-cell">
+                                <span style="color:var(--text-secondary);font-size:0.85rem;">{{ order.requirements|truncatechars:80 }}</span>
+                                {% if order.requirements|length > 80 %}
+                                    <details style="margin-top:0.3rem;">
+                                        <summary style="color:var(--accent-primary);font-size:0.8rem;cursor:pointer;">Read more</summary>
+                                        <p style="margin-top:0.5rem;color:var(--text-secondary);font-size:0.85rem;white-space:pre-wrap;padding:0.5rem;background:var(--bg-secondary);border-radius:6px;">{{ order.requirements }}</p>
+                                    </details>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <span style="color:var(--text-muted);font-style:italic;">None provided</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-weight:600;color:var(--accent-primary);">RM {{ order.gig.price }}</td>
+                    <td style="color:var(--text-secondary);">{{ order.date_ordered|date:"M d, Y" }}</td>
+                    <td>
+                        <span class="badge badge-{{ order.status }}">{{ order.get_status_display }}</span>
+                    </td>
+                    <td style="max-width:280px;">
+                        <!-- Status transition / general updates -->
+                        {% if order.status == 'pending' %}
+                            <form method="post" action="{% url 'marketplace:update_order_status' order.id %}" style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.5rem;">
+                                {% csrf_token %}
+                                <select name="status" class="status-select" style="flex:1;">
+                                    <option value="pending" selected>Pending</option>
+                                    <option value="progress">Accept &amp; Start</option>
+                                    <option value="cancelled">Cancel Order</option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                            </form>
+                        {% endif %}
+
+                        <!-- Delivery actions -->
+                        {% if order.status == 'progress' %}
+                            <div style="display:flex; flex-direction:column; gap:0.5rem;">
+                                <span style="font-size:0.8rem; color:var(--text-muted);">Status: In Progress</span>
+                                <a href="{% url 'marketplace:submit_work' order.id %}" class="btn btn-sm btn-primary" style="text-align:center; display:block;">
+                                    📤 Submit Completed Work
+                                </a>
+                                <form method="post" action="{% url 'marketplace:update_order_status' order.id %}" style="display:flex;gap:0.5rem;align-items:center;">
+                                    {% csrf_token %}
+                                    <select name="status" class="status-select" style="flex:1; padding: 0.35rem 0.6rem; font-size: 0.78rem;">
+                                        <option value="progress" selected>In Progress</option>
+                                        <option value="cancelled">Cancel Order</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-outline" style="padding: 0.35rem 0.6rem; font-size: 0.78rem;">Update</button>
+                                </form>
+                            </div>
+                        {% elif order.status == 'delivered' or order.status == 'completed' %}
+                            <div class="delivery-box" style="background: rgba(0, 212, 170, 0.03); border: 1px solid var(--glass-border); padding: 0.75rem; border-radius: 8px;">
+                                <div style="font-weight: 600; color: var(--success); font-size: 0.8rem; margin-bottom: 0.3rem;">
+                                    ✓ Submitted Delivery
+                                </div>
+                                <p style="margin: 0.25rem 0; font-size: 0.82rem; color: var(--text-secondary); white-space: pre-wrap;">{{ order.submission_text }}</p>
+                                
+                                {% if order.submission_file %}
+                                    <div style="margin-top: 0.4rem;">
+                                        <a href="{{ order.submission_file.url }}" download class="btn btn-sm btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.72rem; display: inline-flex; align-items: center; gap: 0.25rem;">
+                                            💾 Download File
+                                        </a>
+                                    </div>
+                                {% endif %}
+
+                                {% if order.status == 'delivered' %}
+                                    <div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-muted); font-style: italic;">
+                                        Waiting for buyer to accept &amp; complete.
+                                    </div>
+                                    <a href="{% url 'marketplace:submit_work' order.id %}" class="btn btn-sm btn-outline" style="text-align:center; display:block; margin-top:0.5rem; font-size:0.75rem; padding:0.3rem;">
+                                        ✏️ Update Submission
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% elif order.status == 'cancelled' %}
+                            <span style="color:var(--danger); font-style:italic; font-size:0.85rem;">Order Cancelled</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <span class="empty-state-icon">📬</span>
+        <p>No incoming orders yet.</p>
+        <p style="color:var(--text-muted);font-size:0.9rem;">Orders from buyers will appear here once they start coming in.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'marketplace/base.html' %}
+
+{% block title %}{{ action }} Gig - SkillShare Hub{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="form-container">
+        <h2>{{ action }} Your Gig</h2>
+        <p class="form-subtitle">Fill in the details below to {% if action == "Edit" %}update{% else %}list{% endif %} your service.</p>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <p class="form-help">{{ field.help_text }}</p>
+                {% endif %}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <p class="form-error">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary btn-full mt-2">
+                {% if action == "Edit" %}Update Gig{% else %}Create Gig{% endif %}
+            </button>
+        </form>
+
+        <div class="form-footer">
+            <a href="{% url 'marketplace:seller_dashboard' %}">← Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'marketplace/base.html' %}
+
+{% block title %}Delete Gig - SkillShare Hub{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="form-container">
+        <h2>Delete Gig</h2>
+
+        <div style="text-align:center;margin:1.5rem 0;">
+            <span style="font-size:3rem;display:block;margin-bottom:1rem;">⚠️</span>
+            <p style="color:var(--text-secondary);line-height:1.7;">
+                Are you sure you want to delete <strong style="color:var(--text-primary);">"{{ gig.title }}"</strong>?<br>
+                This action cannot be undone.
+            </p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="display:flex;gap:1rem;margin-top:2rem;">
+                <button type="submit" class="btn btn-danger" style="flex:1;">Yes, Delete</button>
+                <a href="{% url 'marketplace:seller_dashboard' %}" class="btn btn-secondary" style="flex:1;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
